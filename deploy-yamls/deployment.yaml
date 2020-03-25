@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Lykke.Service.AdminManagement
+  labels:
+    app: admin-management
+    environment: Development
+    tier: Service
+  name: admin-management
+  namespace: services
+spec:
+  revisionHistoryLimit: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-management
+  template:
+    metadata:
+      labels:
+        app: admin-management
+      name: admin-management
+    spec:
+      containers:
+      - name: admin-management
+        image: lykkebusiness/service-adminmanagement:dev
+        imagePullPolicy: Always
+        lifecycle:
+          postStart:
+            exec:
+             command:
+             - /bin/sh
+             - -c 
+             - "/bin/echo 'options single-request-reopen' >> /etc/resolv.conf"
+        ports:
+        - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /api/isalive
+            port: 5000
+          initialDelaySeconds: 40
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/isalive
+            port: 5000
+          initialDelaySeconds: 40
+          periodSeconds: 20
+        resources:
+          requests:
+            memory: 128Mi 
+            cpu: 40m 
+          limits:
+            memory: 1024Mi 
+            cpu: 1000m 
+        env:
+        - name: BuildNumber
+          value: '$version'
+        - name: SettingsUrl
+          value: '$ConnectionString'
+        - name: ENV_INFO
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MyMonitoringUrl
+          value: http://admin-management.services.svc.cluster.local/api/isalive
+        - name: CPApiKey
+          valueFrom:
+            secretKeyRef:
+              name: admin-management
+              key: CPApiKey

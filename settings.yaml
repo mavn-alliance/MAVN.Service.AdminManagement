@@ -1,0 +1,58 @@
+AdminManagementService:
+  Db:
+    LogsConnString:
+      settings-key: AdminManagementService-LogsConnString
+      types:
+        - AzureTableStorage
+    DbConnectionString:
+      settings-key: AdminManagementService-DbConnectionString
+  RabbitMq:
+    RabbitMqConnectionString:
+      settings-key: ReferralRabbitMQ
+      types:
+        - RabbitMq
+  Redis:
+    ConnectionString:
+      settings-key: AdminManagementService-Redis-ConnectionString
+    InstanceName:
+      settings-key: AdminManagementService-Redis-InstanceName
+    Ttl:
+      settings-key: AdminManagementService-Redis-Ttl
+  BackOfficeLink:
+    settings-key: AdminManagementService-BackOfficeLink
+  AdminCreatedEmail:
+    EmailTemplateId:
+      settings-key: AdminManagementService-AdminCreatedEmail-EmailTemplateId
+    SubjectTemplateId:
+      settings-key: AdminManagementService-AdminCreatedEmail-SubjectTemplateId
+  PasswordResetEmail:
+    EmailTemplateId:
+      settings-key: AdminManagementService-PasswordResetEmail-EmailTemplateId
+    SubjectTemplateId:
+      settings-key: AdminManagementService-PasswordResetEmail-SubjectTemplateId
+
+SessionsService:
+  ServiceUrl:
+    settings-key: AdminSessionsServiceUrl
+
+CredentialsService:
+  ServiceUrl:
+    settings-key: AdminCredentialsServiceUrl
+
+CustomerProfileServiceClient:
+  ServiceUrl:
+    settings-key: CustomerProfileServiceUrl
+
+SlackNotifications:
+  AzureQueue:
+    ConnectionString:
+      settings-key: SlackNotificationsConnString
+      types:
+        - AzureTableStorage
+    QueueName:
+      settings-key: SlackQueueName
+
+MonitoringServiceClient:
+  MonitoringServiceUrl:
+    settings-key: MonitoringServiceUrl
+
