@@ -22,7 +22,7 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Lykke.Service.AdminManagement.MsSqlRepositories.Entities.AdminUserEntity", b =>
+            modelBuilder.Entity("MAVN.Service.AdminManagement.MsSqlRepositories.Entities.AdminUserEntity", b =>
                 {
                     b.Property<string>("AdminUserId")
                         .ValueGeneratedOnAdd()
