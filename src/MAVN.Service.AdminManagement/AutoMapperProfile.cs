@@ -1,12 +1,9 @@
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using JetBrains.Annotations;
 using MAVN.Service.AdminManagement.Client.Models;
 using MAVN.Service.AdminManagement.Client.Models.Enums;
-using MAVN.Service.AdminManagement.Client.Models.Requests;
 using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.Domain.Models;
-using AdminUser = Lykke.Service.AdminManagement.Domain.Models.AdminUser;
 
 namespace MAVN.Service.AdminManagement
 {

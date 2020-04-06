@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Autofac;
 using JetBrains.Annotations;
 using Lykke.HttpClientGenerator;
@@ -33,7 +33,7 @@ namespace MAVN.Service.AdminManagement.Client
                 throw new ArgumentException("Value cannot be null or whitespace.",
                     nameof(AdminManagementServiceClientSettings.ServiceUrl));
 
-            var clientBuilder = HttpClientGenerator.HttpClientGenerator.BuildForUrl(settings.ServiceUrl)
+            var clientBuilder = HttpClientGenerator.BuildForUrl(settings.ServiceUrl)
                 .WithAdditionalCallsWrapper(new ExceptionHandlerCallsWrapper());
 
             clientBuilder = builderConfigure?.Invoke(clientBuilder) ?? clientBuilder.WithoutRetries();
