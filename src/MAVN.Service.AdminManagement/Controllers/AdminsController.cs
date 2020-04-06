@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -8,17 +6,13 @@ using AutoMapper;
 using Lykke.Common.Api.Contract.Responses;
 using MAVN.Service.AdminManagement.Client;
 using MAVN.Service.AdminManagement.Client.Models;
-using MAVN.Service.AdminManagement.Client.Models.Enums;
 using MAVN.Service.AdminManagement.Client.Models.Requests;
-using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.Domain.Exceptions;
 using MAVN.Service.AdminManagement.Domain.Models;
 using MAVN.Service.AdminManagement.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
-using Refit;
-using AdminPermissionCheckErrorCodes = Lykke.Service.AdminManagement.Client.Models.Enums.AdminPermissionCheckErrorCodes;
-using AdminUser = Lykke.Service.AdminManagement.Client.Models.AdminUser;
-using SuggestedValueType = Lykke.Service.AdminManagement.Client.Models.Enums.SuggestedValueType;
+using AdminUser = MAVN.Service.AdminManagement.Client.Models.AdminUser;
+using SuggestedValueType = MAVN.Service.AdminManagement.Client.Models.Enums.SuggestedValueType;
 
 namespace MAVN.Service.AdminManagement.Controllers
 {
