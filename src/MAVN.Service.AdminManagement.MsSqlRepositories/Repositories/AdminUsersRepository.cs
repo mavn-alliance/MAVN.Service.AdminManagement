@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -28,7 +28,7 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Repositories
         {
             using (var context = _contextFactory.CreateDataContext())
             {
-                var entities = await context.AdminUser.ToListAsync();
+                var entities = await context.AdminUser.AsNoTracking().ToListAsync();
 
                 return _mapper.Map<List<AdminUserEncrypted>>(entities);
             }
@@ -38,14 +38,14 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Repositories
         {
             using (var context = _contextFactory.CreateDataContext())
             {
-                var entities = await context.AdminUser
+                var entities = await context.AdminUser.AsNoTracking()
                     .Where(x => !active.HasValue || x.IsDisabled == !active.Value)
                     .OrderByDescending(x => x.RegisteredAt)
                     .Skip(skip)
                     .Take(take)
                     .ToListAsync();
 
-                var count = context.AdminUser.Count(x => !active.HasValue || x.IsDisabled == !active.Value);
+                var count = context.AdminUser.AsNoTracking().Count(x => !active.HasValue || x.IsDisabled == !active.Value);
                 var admins = _mapper.Map<List<AdminUserEncrypted>>(entities);
 
                 return (admins, count);
@@ -59,14 +59,14 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Repositories
                 var emailHash = GetHash(email);
                 
                 var entity = await context
-                    .AdminUser.FirstOrDefaultAsync(c => c.EmailHash == emailHash && (!active.HasValue || c.IsDisabled == !active.Value));
+                    .AdminUser.AsNoTracking().FirstOrDefaultAsync(c => c.EmailHash == emailHash && (!active.HasValue || c.IsDisabled == !active.Value));
 
                 if (entity == null)
                 {
                     emailHash = GetHash(email.ToLower());
                     
                     entity = await context
-                        .AdminUser.FirstOrDefaultAsync(c => c.EmailHash == emailHash && (!active.HasValue || c.IsDisabled == !active.Value));
+                        .AdminUser.AsNoTracking().FirstOrDefaultAsync(c => c.EmailHash == emailHash && (!active.HasValue || c.IsDisabled == !active.Value));
                 }
 
                 return _mapper.Map<AdminUserEncrypted>(entity);
@@ -118,7 +118,7 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Repositories
         {
             using (var context = _contextFactory.CreateDataContext())
             {
-                var entity = await context.AdminUser
+                var entity = await context.AdminUser.AsNoTracking()
                     .FirstOrDefaultAsync(a => a.AdminUserId == adminUserId);
 
                 return _mapper.Map<AdminUserEncrypted>(entity);

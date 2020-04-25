@@ -1,4 +1,4 @@
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Lykke.SettingsReader.Attributes;
 
 namespace MAVN.Service.AdminManagement.Settings
@@ -15,5 +15,6 @@ namespace MAVN.Service.AdminManagement.Settings
         public RabbitMqSettings RabbitMq { get; set; }
         
         public RedisSettings Redis { set; get; }
+        public LimitationSettings LimitationSettings { get; set; }
     }
 }

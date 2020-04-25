@@ -7,6 +7,9 @@ using Lykke.Common.Api.Contract.Responses;
 using MAVN.Service.AdminManagement.Client;
 using MAVN.Service.AdminManagement.Client.Models;
 using MAVN.Service.AdminManagement.Client.Models.Requests;
+using MAVN.Service.AdminManagement.Client.Models.Requests.Verification;
+using MAVN.Service.AdminManagement.Client.Models.Responses.Verification;
+using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.Domain.Exceptions;
 using MAVN.Service.AdminManagement.Domain.Models;
 using MAVN.Service.AdminManagement.Domain.Services;
@@ -21,15 +24,18 @@ namespace MAVN.Service.AdminManagement.Controllers
     public class AdminsController : Controller, IAdminsClient
     {
         private readonly IAdminUserService _adminUserService;
+        private readonly IEmailVerificationService _emailVerificationService;
         private readonly IMapper _mapper;
         private readonly IAutofillValuesService _autofillValuesService;
 
         public AdminsController(
             IAdminUserService adminUserService,
+            IEmailVerificationService emailVerificationService,
             IMapper mapper,
             IAutofillValuesService autofillValuesService)
         {
             _adminUserService = adminUserService;
+            _emailVerificationService = emailVerificationService;
             _mapper = mapper;
             _autofillValuesService = autofillValuesService;
         }
@@ -66,18 +72,24 @@ namespace MAVN.Service.AdminManagement.Controllers
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
         public async Task<RegistrationResponseModel> RegisterAsync([FromBody] RegistrationRequestModel request)
         {
-            var result = await _adminUserService.RegisterAsync(
-                request.Email,
-                request.Password,
-                request.FirstName,
-                request.LastName,
-                request.PhoneNumber,
-                request.Company,
-                request.Department,
-                request.JobTitle,
-                _mapper.Map<IReadOnlyList<Permission>>(request.Permissions));
+            var result = await _adminUserService.RegisterAsync(_mapper.Map<RegistrationRequestDto>(request));
 
             return _mapper.Map<RegistrationResponseModel>(result);
+        }
+
+        /// <summary>
+        /// Confirm Email in the system.
+        /// </summary>
+        /// <param name="request">Request.</param>
+        /// <returns><see cref="VerificationCodeConfirmationResponseModel"/></returns>
+        [HttpPost("confirmemail")]
+        [ProducesResponseType(typeof(VerificationCodeConfirmationResponseModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<VerificationCodeConfirmationResponseModel> ConfirmEmailAsync([FromBody] VerificationCodeConfirmationRequestModel request)
+        {
+            var confirmEmailModel = await _emailVerificationService.ConfirmCodeAsync(request.VerificationCode);
+
+            return _mapper.Map<VerificationCodeConfirmationResponseModel>(confirmEmailModel);
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
@@ -22,6 +22,8 @@ namespace MAVN.Service.AdminManagement.Client.Models
         /// Email address of the Admin
         /// </summary>
         public string Email { get; set; }
+        /// <summary>Email Verified flag.</summary>
+        public string IsEmailVerified { get; set; }
         /// <summary>
         /// First Name
         /// </summary>

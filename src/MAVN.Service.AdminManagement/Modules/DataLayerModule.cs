@@ -1,4 +1,4 @@
-using Autofac;
+﻿using Autofac;
 using JetBrains.Annotations;
 using Lykke.Common.MsSql;
 using MAVN.Service.AdminManagement.Domain.Repositories;
@@ -6,6 +6,7 @@ using MAVN.Service.AdminManagement.MsSqlRepositories;
 using MAVN.Service.AdminManagement.MsSqlRepositories.Repositories;
 using MAVN.Service.AdminManagement.Settings;
 using Lykke.SettingsReader;
+using System;
 
 namespace MAVN.Service.AdminManagement.Modules
 {
@@ -13,10 +14,12 @@ namespace MAVN.Service.AdminManagement.Modules
     public class DataLayerModule : Module
     {
         private readonly DbSettings _settings;
+        private readonly TimeSpan _verificationLinkExpirePeriod;
 
         public DataLayerModule(IReloadingManager<AppSettings> settings)
         {
             _settings = settings.CurrentValue.AdminManagementService.Db;
+            _verificationLinkExpirePeriod = settings.CurrentValue.AdminManagementService.AdminCreatedEmail.VerificationLinkExpirePeriod;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -32,6 +35,11 @@ namespace MAVN.Service.AdminManagement.Modules
 
             builder.RegisterType<PermissionsRepository>()
                 .As<IPermissionsRepository>()
+                .SingleInstance();
+
+            builder.RegisterType<EmailVerificationCodeRepository>()
+                .WithParameter(TypedParameter.From(_verificationLinkExpirePeriod))
+                .As<IEmailVerificationCodeRepository>()
                 .SingleInstance();
         }
     }

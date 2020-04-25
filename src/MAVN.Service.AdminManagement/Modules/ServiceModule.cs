@@ -1,4 +1,4 @@
-using Autofac;
+﻿using Autofac;
 using JetBrains.Annotations;
 using Lykke.Sdk;
 using Lykke.Service.Credentials.Client;
@@ -6,10 +6,11 @@ using MAVN.Service.AdminManagement.Domain.Services;
 using MAVN.Service.AdminManagement.DomainServices;
 using MAVN.Service.AdminManagement.Managers;
 using MAVN.Service.AdminManagement.Settings;
-using Lykke.Service.CustomerProfile.Client;
+using MAVN.Service.CustomerProfile.Client;
 using Lykke.Service.Sessions.Client;
 using Lykke.SettingsReader;
 using StackExchange.Redis;
+using MAVN.Service.AdminManagement.Domain.Models;
 
 namespace MAVN.Service.AdminManagement.Modules
 {
@@ -59,11 +60,31 @@ namespace MAVN.Service.AdminManagement.Modules
                 .WithParameter("ttl", _appSettings.CurrentValue.AdminManagementService.Redis.Ttl)
                 .SingleInstance();
 
+            #region Verification
+
+            builder.RegisterType<EmailVerificationService>()
+                .As<IEmailVerificationService>()
+                .SingleInstance();
+
+            var callRateLimitSettingsDto = new CallRateLimitSettingsDto
+            {
+                EmailVerificationCallsMonitoredPeriod = _appSettings.CurrentValue.AdminManagementService.LimitationSettings.EmailVerificationCallsMonitoredPeriod,
+                EmailVerificationMaxAllowedRequestsNumber = _appSettings.CurrentValue.AdminManagementService.LimitationSettings.EmailVerificationMaxAllowedRequestsNumber,
+            };
+
+            builder.RegisterType<CallRateLimiterService>()
+                .As<ICallRateLimiterService>()
+                .WithParameter(TypedParameter.From(callRateLimitSettingsDto))
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.AdminManagementService.Redis.InstanceName));
+
+            #endregion
+
             builder.RegisterType<NotificationsService>()
                 .As<INotificationsService>()
                 .WithParameter("backOfficeUrl", _appSettings.CurrentValue.AdminManagementService.BackOfficeLink)
                 .WithParameter("adminCreatedEmailTemplateId", _appSettings.CurrentValue.AdminManagementService.AdminCreatedEmail.EmailTemplateId)
                 .WithParameter("adminCreatedEmailSubjectTemplateId", _appSettings.CurrentValue.AdminManagementService.AdminCreatedEmail.SubjectTemplateId)
+                .WithParameter("adminCreatedVerificationLinkPath", _appSettings.CurrentValue.AdminManagementService.AdminCreatedEmail.VerificationLinkPath)
                 .WithParameter("adminPasswordResetEmailTemplateId", _appSettings.CurrentValue.AdminManagementService.PasswordResetEmail.EmailTemplateId)
                 .WithParameter("adminPasswordResetEmailSubjectTemplateId", _appSettings.CurrentValue.AdminManagementService.PasswordResetEmail.SubjectTemplateId)
                 .SingleInstance();

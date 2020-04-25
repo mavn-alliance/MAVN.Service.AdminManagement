@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Falcon.Common;
@@ -10,17 +10,21 @@ using MAVN.Service.AdminManagement.Domain.Services;
 using Lykke.Service.Credentials.Client;
 using Lykke.Service.Credentials.Client.Models.Requests;
 using Lykke.Service.Credentials.Client.Models.Responses;
-using Lykke.Service.CustomerProfile.Client;
-using Lykke.Service.CustomerProfile.Client.Models.Enums;
-using Lykke.Service.CustomerProfile.Client.Models.Requests;
-using Lykke.Service.CustomerProfile.Client.Models.Responses;
+using MAVN.Service.CustomerProfile.Client;
+using MAVN.Service.CustomerProfile.Client.Models.Enums;
+using MAVN.Service.CustomerProfile.Client.Models.Requests;
+using MAVN.Service.CustomerProfile.Client.Models.Responses;
 using Moq;
 using Xunit;
+using AutoMapper;
 
 namespace MAVN.Service.AdminManagement.DomainServices.Tests
 {
     public class AdminUsersServiceTests
     {
+        private readonly Mock<IEmailVerificationCodeRepository> _emailVerificationCodeRepositoryMock =
+            new Mock<IEmailVerificationCodeRepository>();
+
         private readonly Mock<IAdminUsersRepository> _adminUsersRepositoryMock =
             new Mock<IAdminUsersRepository>();
 
@@ -63,12 +67,17 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
                     ErrorCode = AdminProfileErrorCodes.None
                 });
 
+            var mockMapper = new MapperConfiguration(cfg => { cfg.AddProfile(new AutoMapperProfile()); });
+            var mapper = mockMapper.CreateMapper();
+
             _service = new AdminUserService(
                 _adminUsersRepositoryMock.Object,
                 _credentialsClientMock.Object,
                 _customerProfileClientMock.Object,
+                _emailVerificationCodeRepositoryMock.Object,
                 _permissionsServiceMock.Object,
                 EmptyLogFactory.Instance,
+                mapper,
                 _notificationsServiceMock.Object,
                 _permissionsCacheMock.Object);
         }
@@ -78,16 +87,7 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
         {
             // act
 
-            var result = await _service.RegisterAsync(
-                "email@email.com", 
-                "password", 
-                "first name", 
-                "last name",
-                "phone_number",
-                "company",
-                "department",
-                    "jobTitle",
-                new List<Permission>());
+            var result = await _service.RegisterAsync(GetRegisterRequest());
 
             // assert
 
@@ -102,18 +102,13 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             const string email = "email@email.com";
             const string password = "password";
 
+            var model = GetRegisterRequest();
+            model.Email = email;
+            model.Password = password;
+
             // act
 
-            await _service.RegisterAsync(
-                email,
-                password, 
-                "first name", 
-                "last name",
-                "phone_number",
-                "company",
-                "department",
-                "jobTitle",
-                new List<Permission>());
+            await _service.RegisterAsync(model);
 
             // assert
 
@@ -129,18 +124,12 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             const string email = "email@email.com";
             string emailHash = new Sha256HashingUtil().Sha256HashEncoding1252(email);
 
+            var model = GetRegisterRequest();
+            model.Email = email;
+
             // act
 
-            await _service.RegisterAsync(
-                email,
-                "password", 
-                "first name", 
-                "last name",
-                "phone_number",
-                "company",
-                "department",
-                "jobTitle",
-                new List<Permission>());
+            await _service.RegisterAsync(model);
 
             // assert
 
@@ -157,18 +146,14 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             const string firstName = "first name";
             const string lastName = "last name";
 
+            var model = GetRegisterRequest();
+            model.Email = email;
+            model.FirstName = firstName;
+            model.LastName = lastName;
+
             // act
 
-            await _service.RegisterAsync(
-                email,
-                "password", 
-                firstName, 
-                lastName,
-                "phone_number",
-                "company",
-                "department",
-                "jobTitle",
-                new List<Permission>());
+            await _service.RegisterAsync(model);
 
             // assert
 
@@ -186,20 +171,28 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
 
             // act
 
-            var result = await _service.RegisterAsync(
-                "email@email.com", 
-                "password", 
-                "first name", 
-                "last name",
-                "phone_number",
-                "company",
-                "department",
-                "jobTitle",
-                new List<Permission>());
+            var result = await _service.RegisterAsync(GetRegisterRequest());
 
             // assert
 
             Assert.Equal(ServicesError.AlreadyRegistered, result.Error);
+        }
+
+        private RegistrationRequestDto GetRegisterRequest()
+        {
+            return new RegistrationRequestDto
+            {
+                Email = "email@email.com",
+                Password = "password",
+                FirstName = "first name",
+                LastName = "last name",
+                PhoneNumber = "phone_number",
+                Company = "company",
+                Department = "department",
+                JobTitle = "jobTitle",
+                Permissions = new List<Permission>(),
+                Localization = Localization.En
+            };
         }
     }
 }
