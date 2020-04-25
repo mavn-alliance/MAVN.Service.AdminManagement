@@ -440,7 +440,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
             }
             else
             {
-                _mapper.Map(adminProfile, admin);
+                _mapper.Map(adminProfile.Data, admin);
             }
 
             return admin;

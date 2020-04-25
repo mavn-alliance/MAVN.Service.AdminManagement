@@ -32,16 +32,17 @@ namespace MAVN.Service.AdminManagement
             CreateMap<Client.Models.Enums.Localization, Domain.Enums.Localization>();
             CreateMap<ConfirmVerificationCodeResultModel, VerificationCodeConfirmationResponseModel>();
 
-            // AdminUser
-            CreateMap<AdminProfile, Domain.Models.AdminUser>(MemberList.None);
+            #region AdminUser
+
+            CreateMap<MAVN.Service.CustomerProfile.Client.Models.Responses.AdminProfile, Domain.Models.AdminUser>(MemberList.None);
             CreateMap<AdminUserEncrypted, Domain.Models.AdminUser>(MemberList.None);
             CreateMap<Domain.Models.AdminUser, Client.Models.AdminUser>();
             CreateMap<PaginatedAdminUserModel, PaginatedAdminUserResponseModel>();
-            CreateMap<AdminUserResult, AdminUserResponseModel>()
-                .ForMember(c => c.Profile, a => a.MapFrom(x => x.Profile))
-                .ForMember(c => c.Error, a => a.MapFrom(x => x.Error));
+            CreateMap<AdminUserResult, AdminUserResponseModel>();
             CreateMap<AdminUserResponseErrorCodes, AdminUserErrorCodes>();
-            
+
+            #endregion
+
             // Permission
             CreateMap<AdminPermission, Permission>();
             CreateMap<Permission, AdminPermission>();
