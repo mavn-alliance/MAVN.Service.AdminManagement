@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -14,11 +14,14 @@ using MAVN.Service.AdminManagement.Domain.Services;
 using Lykke.Service.Credentials.Client;
 using Lykke.Service.Credentials.Client.Models.Requests;
 using Lykke.Service.Credentials.Client.Models.Responses;
-using Lykke.Service.CustomerProfile.Client;
-using Lykke.Service.CustomerProfile.Client.Models.Enums;
-using Lykke.Service.CustomerProfile.Client.Models.Requests;
-using Lykke.Service.CustomerProfile.Client.Models.Responses;
+using MAVN.Service.CustomerProfile.Client;
+using MAVN.Service.CustomerProfile.Client.Models.Enums;
+using MAVN.Service.CustomerProfile.Client.Models.Requests;
+using MAVN.Service.CustomerProfile.Client.Models.Responses;
 using MoreLinq;
+using AutoMapper;
+using MAVN.Service.AdminManagement.Domain.Models.Emails;
+using Common;
 
 namespace MAVN.Service.AdminManagement.DomainServices
 {
@@ -28,7 +31,9 @@ namespace MAVN.Service.AdminManagement.DomainServices
         private readonly INotificationsService _notificationsService;
         private readonly ICredentialsClient _credentialsClient;
         private readonly ICustomerProfileClient _customerProfileClient;
+        private readonly IEmailVerificationCodeRepository _emailVerificationCodeRepository;
         private readonly IPermissionsService _permissionsService;
+        private readonly IMapper _mapper;
         private readonly IPermissionsCache _permissionsCache;
         private readonly ILog _log;
 
@@ -36,15 +41,19 @@ namespace MAVN.Service.AdminManagement.DomainServices
             IAdminUsersRepository adminUsersRepository,
             ICredentialsClient credentialsClient,
             ICustomerProfileClient customerProfileClient,
+            IEmailVerificationCodeRepository emailVerificationCodeRepository,
             IPermissionsService permissionsService,
             ILogFactory logFactory,
+            IMapper mapper,
             INotificationsService notificationsService,
             IPermissionsCache permissionsCache)
         {
             _adminUsersRepository = adminUsersRepository;
             _credentialsClient = credentialsClient;
             _customerProfileClient = customerProfileClient;
+            _emailVerificationCodeRepository = emailVerificationCodeRepository;
             _permissionsService = permissionsService;
+            _mapper = mapper;
             _notificationsService = notificationsService;
             _permissionsCache = permissionsCache;
             _log = logFactory.CreateLog(this);
@@ -181,27 +190,18 @@ namespace MAVN.Service.AdminManagement.DomainServices
             return new AdminUserResult {Profile = profile};
         }
 
-        public async Task<RegistrationResultModel> RegisterAsync(
-            string email,
-            string password,
-            string firstName,
-            string lastName,
-            string phoneNumber,
-            string company,
-            string department,
-            string jobTitle,
-            IReadOnlyList<Permission> permissions)
+        public async Task<RegistrationResultModel> RegisterAsync(RegistrationRequestDto model)
         {
             var adminId = Guid.NewGuid().ToString();
-            
-            email = email.ToLower();
+
+            model.Email = model.Email.ToLower();
             
             CredentialsCreateResponse adminCredentialsCreationResult;
 
             try
             {
                 adminCredentialsCreationResult = await _credentialsClient.Admins.CreateAsync(
-                    new AdminCredentialsCreateRequest {Login = email, AdminId = adminId, Password = password});
+                    new AdminCredentialsCreateRequest {Login = model.Email, AdminId = adminId, Password = model.Password});
             }
             catch (ClientApiException exception) when (exception.HttpStatusCode == HttpStatusCode.BadRequest)
             {
@@ -211,7 +211,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
             if (adminCredentialsCreationResult.Error == CredentialsError.LoginAlreadyExists)
                 return new RegistrationResultModel {Error = ServicesError.AlreadyRegistered};
 
-            var emailHash = GetHash(email);
+            var emailHash = GetHash(model.Email);
             
             if (adminCredentialsCreationResult.Error != CredentialsError.None)
             {
@@ -247,21 +247,13 @@ namespace MAVN.Service.AdminManagement.DomainServices
             }
 
             var adminProfileCreationResult = await _customerProfileClient.AdminProfiles.AddAsync(
-                new AdminProfileRequest
-                {
-                    AdminId = Guid.Parse(adminId),
-                    Email = email,
-                    FirstName = firstName,
-                    LastName = lastName,
-                    Company = company,
-                    Department = department,
-                    JobTitle = jobTitle,
-                    PhoneNumber = phoneNumber
-                });
+                _mapper.Map<RegistrationRequestDto, AdminProfileRequest>(model,
+                    opt => opt.AfterMap((src, dest) => { dest.AdminId = Guid.Parse(adminId); }))
+                );
 
-            await _permissionsService.CreateOrUpdatePermissionsAsync(adminId, permissions);
+            await _permissionsService.CreateOrUpdatePermissionsAsync(adminId, model.Permissions);
 
-            await _permissionsCache.SetAsync(adminId, permissions.ToList());
+            await _permissionsCache.SetAsync(adminId, model.Permissions.ToList());
 
             if (adminProfileCreationResult.ErrorCode != AdminProfileErrorCodes.None)
             {
@@ -269,25 +261,36 @@ namespace MAVN.Service.AdminManagement.DomainServices
                     context: $"adminUserId: {adminId}; error: {adminProfileCreationResult.ErrorCode}");
             }
 
-            var fullName = $"{firstName} {lastName}";
+            #region email verification code
 
-            await _notificationsService.NotifyAdminCreatedAsync(adminId, email, email, password, fullName);
+            var emailVerificationCode = Guid.NewGuid().ToString();
 
-            return new RegistrationResultModel { Admin = new AdminUser
+            var emailVerificationCodeEntity = await _emailVerificationCodeRepository.CreateOrUpdateAsync(
+                adminId,
+                emailVerificationCode);
+
+            #endregion
+
+            await _notificationsService.NotifyAdminCreatedAsync(new AdminCreatedEmailDto
             {
                 AdminUserId = adminId,
-                Company = adminProfileCreationResult.Data.Company,
-                Department = adminProfileCreationResult.Data.Department,
-                Email = adminProfileCreationResult.Data.Email,
-                FirstName = adminProfileCreationResult.Data.FirstName,
-                LastName = adminProfileCreationResult.Data.LastName,
-                JobTitle = adminProfileCreationResult.Data.JobTitle,
-                PhoneNumber = adminProfileCreationResult.Data.PhoneNumber,
-                Permissions = permissions.ToList(),
-                RegisteredAt = registrationDateTime,
-                UseDefaultPermissions = false,
-                IsActive = true
-            }};
+                Email = model.Email,
+                EmailVerificationCode = emailVerificationCode.ToBase64(),
+                Password = model.Password,
+                Name = $"{model.FirstName} {model.LastName}",
+                Localization = model.Localization
+            });
+
+            _log.Info(message: "Successfully generated AdminCreatedEmail", context: adminId);
+
+            var adminUser = _mapper.Map<AdminUser>(adminProfileCreationResult.Data);
+            adminUser.AdminUserId = adminId;
+            adminUser.Permissions = model.Permissions.ToList();
+            adminUser.RegisteredAt = registrationDateTime;
+            adminUser.UseDefaultPermissions = false;
+            adminUser.IsActive = true;
+
+            return new RegistrationResultModel { Admin = adminUser };
         }
 
         public async Task<AdminUserResult> GetByIdAsync(string adminId)
@@ -334,8 +337,8 @@ namespace MAVN.Service.AdminManagement.DomainServices
             await _adminUsersRepository.TryUpdateAsync(adminUserEncrypted);
 
             var adminProfile = await _customerProfileClient.AdminProfiles.GetByIdAsync(Guid.Parse(adminUserId));
-            
-            await _customerProfileClient.AdminProfiles.UpdateAsync(new AdminProfileRequest
+
+            adminProfile = await _customerProfileClient.AdminProfiles.UpdateAsync(new AdminProfileRequest
             {
                 AdminId = Guid.Parse(adminUserId),
                 Email = adminProfile.Data.Email,
@@ -346,25 +349,14 @@ namespace MAVN.Service.AdminManagement.DomainServices
                 JobTitle = jobTitle,
                 PhoneNumber = phoneNumber
             });
-            
+
+            var adminUser = _mapper.Map<AdminUser>(adminUserEncrypted);
+            _mapper.Map(adminProfile, adminUser);
+
             return new AdminUserResult
             {
                 Error = AdminUserErrorCodes.None,
-                Profile = new AdminUser
-                {
-                    AdminUserId = adminUserId,
-                    Email = adminProfile.Data.Email,
-                    IsActive = isActive,
-                    Company = company,
-                    Department = department,
-                    FirstName = firstName,
-                    JobTitle = jobTitle,
-                    LastName = lastName,
-                    PhoneNumber = phoneNumber,
-                    RegisteredAt = adminUserEncrypted.RegisteredAt,
-                    UseDefaultPermissions = adminUserEncrypted.UseDefaultPermissions,
-                    Permissions = await GetPermissionsAsync(adminUserId)
-                }
+                Profile = adminUser
             };
         }
 
@@ -413,25 +405,13 @@ namespace MAVN.Service.AdminManagement.DomainServices
 
             foreach (var adminUserEncrypted in adminUsersEncrypted)
             {
-                var admin = new AdminUser
-                {
-                    AdminUserId = adminUserEncrypted.AdminUserId,
-                    RegisteredAt = adminUserEncrypted.RegisteredAt,
-                    IsActive = adminUserEncrypted.IsActive,
-                    UseDefaultPermissions = adminUserEncrypted.UseDefaultPermissions
-                };
+                var admin = _mapper.Map<AdminUser>(adminUserEncrypted);
 
                 var adminId = Guid.Parse(adminUserEncrypted.AdminUserId);
 
                 if (adminProfileMap.TryGetValue(adminId, out var adminProfile))
                 {
-                    admin.FirstName = adminProfile.FirstName;
-                    admin.LastName = adminProfile.LastName;
-                    admin.Email = adminProfile.Email;
-                    admin.Company = adminProfile.Company;
-                    admin.Department = adminProfile.Department;
-                    admin.JobTitle = adminProfile.JobTitle;
-                    admin.PhoneNumber = adminProfile.PhoneNumber;
+                    _mapper.Map(adminProfile, admin);
                 }
                 else
                 {
@@ -447,32 +427,20 @@ namespace MAVN.Service.AdminManagement.DomainServices
 
         private async Task<AdminUser> LoadSensitiveDataAsync(AdminUserEncrypted adminUserEncrypted)
         {
-            var admin = new AdminUser
-            {
-                AdminUserId = adminUserEncrypted.AdminUserId,
-                RegisteredAt = adminUserEncrypted.RegisteredAt,
-                IsActive = adminUserEncrypted.IsActive,
-                UseDefaultPermissions = adminUserEncrypted.UseDefaultPermissions
-            };
+            var admin = _mapper.Map<AdminUser>(adminUserEncrypted);
 
             var adminId = Guid.Parse(adminUserEncrypted.AdminUserId);
 
-            var response = await _customerProfileClient.AdminProfiles.GetByIdAsync(adminId);
+            var adminProfile = await _customerProfileClient.AdminProfiles.GetByIdAsync(adminId);
 
-            if (response.ErrorCode != AdminProfileErrorCodes.None)
+            if (adminProfile.ErrorCode != AdminProfileErrorCodes.None)
             {
                 _log.Error(message: "An error occurred while getting admin profile.",
-                    context: $"adminUserId: {adminUserEncrypted.AdminUserId}; error: {response.ErrorCode}");
+                    context: $"adminUserId: {adminUserEncrypted.AdminUserId}; error: {adminProfile.ErrorCode}");
             }
             else
             {
-                admin.FirstName = response.Data.FirstName;
-                admin.LastName = response.Data.LastName;
-                admin.Email = response.Data.Email;
-                admin.Company = response.Data.Company;
-                admin.Department = response.Data.Department;
-                admin.JobTitle = response.Data.JobTitle;
-                admin.PhoneNumber = response.Data.PhoneNumber;
+                _mapper.Map(adminProfile, admin);
             }
 
             return admin;

@@ -18,6 +18,11 @@ AdminManagementService:
       settings-key: AdminManagementService-Redis-InstanceName
     Ttl:
       settings-key: AdminManagementService-Redis-Ttl
+  LimitationSettings:
+    EmailVerificationMaxAllowedRequestsNumber:
+      settings-key: CustomerManagementService-EmailVerificationMaxAllowedRequestsNumber
+    EmailVerificationCallsMonitoredPeriod:
+      settings-key: CustomerManagementService-EmailVerificationCallsMonitoredPeriod
   BackOfficeLink:
     settings-key: AdminManagementService-BackOfficeLink
   AdminCreatedEmail:
@@ -25,6 +30,10 @@ AdminManagementService:
       settings-key: AdminManagementService-AdminCreatedEmail-EmailTemplateId
     SubjectTemplateId:
       settings-key: AdminManagementService-AdminCreatedEmail-SubjectTemplateId
+    VerificationLinkExpirePeriod:
+      settings-key: AdminManagementService-AdminCreatedEmail-VerificationLinkExpirePeriod
+    VerificationLinkPath:
+      settings-key: AdminManagementService-AdminCreatedEmail-VerificationLinkPath
   PasswordResetEmail:
     EmailTemplateId:
       settings-key: AdminManagementService-PasswordResetEmail-EmailTemplateId

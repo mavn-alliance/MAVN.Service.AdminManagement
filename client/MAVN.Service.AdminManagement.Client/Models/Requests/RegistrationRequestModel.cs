@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using JetBrains.Annotations;
-using MAVN.Service.AdminManagement.Client.Models.Requests;
+using MAVN.Service.AdminManagement.Client.Models.Enums;
 
 namespace MAVN.Service.AdminManagement.Client.Models
 {
@@ -46,5 +46,8 @@ namespace MAVN.Service.AdminManagement.Client.Models
         /// <summary>Back Office Permissions</summary>
         [Required]
         public IReadOnlyList<AdminPermission> Permissions { get; set; }
+
+        /// <summary>Localization</summary>
+        public Localization Localization { get; set; }
     }
 }

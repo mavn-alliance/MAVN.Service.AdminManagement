@@ -1,8 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lykke.Common;
 using MAVN.Service.AdminManagement.Domain.Services;
 using Lykke.Service.NotificationSystem.SubscriberContract;
+using MAVN.Service.AdminManagement.Domain.Enums;
+using MAVN.Service.AdminManagement.Domain.Models.Emails;
 
 namespace MAVN.Service.AdminManagement.DomainServices
 {
@@ -13,6 +15,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
         private readonly string _backOfficeUrl;
         private readonly string _adminCreatedEmailTemplateId;
         private readonly string _adminCreatedEmailSubjectTemplateId;
+        private readonly string _adminCreatedVerificationLinkPath;
         private readonly string _adminPasswordResetEmailTemplateId;
         private readonly string _adminPasswordResetEmailSubjectTemplateId;
 
@@ -21,6 +24,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
             string backOfficeUrl,
             string adminCreatedEmailTemplateId,
             string adminCreatedEmailSubjectTemplateId,
+            string adminCreatedVerificationLinkPath,
             string adminPasswordResetEmailTemplateId,
             string adminPasswordResetEmailSubjectTemplateId)
         {
@@ -28,21 +32,26 @@ namespace MAVN.Service.AdminManagement.DomainServices
             _backOfficeUrl = backOfficeUrl;
             _adminCreatedEmailTemplateId = adminCreatedEmailTemplateId;
             _adminCreatedEmailSubjectTemplateId = adminCreatedEmailSubjectTemplateId;
+            _adminCreatedVerificationLinkPath = adminCreatedVerificationLinkPath;
             _adminPasswordResetEmailTemplateId = adminPasswordResetEmailTemplateId;
             _adminPasswordResetEmailSubjectTemplateId = adminPasswordResetEmailSubjectTemplateId;
         }
 
-        public async Task NotifyAdminCreatedAsync(string adminUserId, string email, string login, string password, string name)
+        public async Task NotifyAdminCreatedAsync(AdminCreatedEmailDto model)
         {
+            var url = GetLocalizedPath(_backOfficeUrl, model.Localization);
+
             var values = new Dictionary<string, string>
             {
-                {"Name", name},
-                {"BackOfficeUrl", _backOfficeUrl},
-                {"Login", login},
-                {"Password", password}
+                {nameof(model.Name), model.Name},
+                {"BackOfficeUrl", url},
+                {"EmailVerificationLink", url + _adminCreatedVerificationLinkPath.TrimStart('/').Replace("{0}", model.EmailVerificationCode)},
+                {"Login", model.Email},
+                {nameof(model.Password), model.Password},
+                {nameof(model.Localization), model.Localization.ToString()}
             };
 
-            await SendEmailAsync(adminUserId, email, values, _adminCreatedEmailTemplateId,
+            await SendEmailAsync(model.AdminUserId, model.Email, values, _adminCreatedEmailTemplateId,
                 _adminCreatedEmailSubjectTemplateId);
         }
 
@@ -73,6 +82,11 @@ namespace MAVN.Service.AdminManagement.DomainServices
                 TemplateParameters = values,
                 Source = $"{AppEnvironment.Name} - {AppEnvironment.Version}"
             });
+        }
+
+        private string GetLocalizedPath(string url, Localization localization)
+        {
+            return url.TrimEnd('/') + $"/{localization.ToString().ToLower()}/";
         }
     }
 }

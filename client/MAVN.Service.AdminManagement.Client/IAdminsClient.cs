@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MAVN.Service.AdminManagement.Client.Models;
 using MAVN.Service.AdminManagement.Client.Models.Requests;
+using MAVN.Service.AdminManagement.Client.Models.Requests.Verification;
+using MAVN.Service.AdminManagement.Client.Models.Responses.Verification;
 using Refit;
 
 namespace MAVN.Service.AdminManagement.Client
@@ -30,6 +30,14 @@ namespace MAVN.Service.AdminManagement.Client
         [Post("/api/admins/register")]
         Task<RegistrationResponseModel> RegisterAsync([Body] RegistrationRequestModel request);
         
+        /// <summary>
+        /// Confirm Email in the system.
+        /// </summary>
+        /// <param name="request">Request.</param>
+        /// <returns><see cref="VerificationCodeConfirmationResponseModel"/></returns>
+        [Post("/api/admins/confirmemail")]
+        Task<VerificationCodeConfirmationResponseModel> ConfirmEmailAsync([Body] VerificationCodeConfirmationRequestModel request);
+
         /// <summary>
         /// Update admin data.
         /// </summary>

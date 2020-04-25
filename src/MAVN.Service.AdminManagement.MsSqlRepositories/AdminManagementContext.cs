@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data.Common;
 using JetBrains.Annotations;
 using Lykke.Common.MsSql;
@@ -14,6 +14,7 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories
 
         internal DbSet<AdminUserEntity> AdminUser { get; set; }
         internal DbSet<PermissionEntity> Permissions { get; set; }
+        internal DbSet<EmailVerificationCodeEntity> EmailVerificationCodes { get; set; }
 
         [UsedImplicitly]
         public AdminManagementContext() : base(Schema)
@@ -53,6 +54,10 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories
                 .HasConversion(
                     v => v.ToString(),
                     v => (PermissionLevel)Enum.Parse(typeof(PermissionLevel), v));
+
+            modelBuilder.Entity<EmailVerificationCodeEntity>()
+                .HasIndex(_ => _.VerificationCode)
+                .IsUnique();
         }
     }
 }

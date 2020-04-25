@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MAVN.Service.AdminManagement.Domain.Models
@@ -17,6 +17,9 @@ namespace MAVN.Service.AdminManagement.Domain.Models
         /// The email address.
         /// </summary>
         public string Email { get; set; }
+
+        /// <summary>Email Verified flag.</summary>
+        public bool IsEmailVerified { get; set; }
 
         /// <summary>
         /// The first name.

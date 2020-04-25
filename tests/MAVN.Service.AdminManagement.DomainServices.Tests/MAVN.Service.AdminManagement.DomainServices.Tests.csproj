@@ -13,5 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\MAVN.Service.AdminManagement.DomainServices\MAVN.Service.AdminManagement.DomainServices.csproj" />
+    <ProjectReference Include="..\..\src\MAVN.Service.AdminManagement\MAVN.Service.AdminManagement.csproj" />
   </ItemGroup>
 </Project>

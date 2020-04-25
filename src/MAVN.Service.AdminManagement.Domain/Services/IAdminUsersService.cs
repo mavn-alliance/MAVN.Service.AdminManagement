@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.Domain.Models;
@@ -29,16 +29,7 @@ namespace MAVN.Service.AdminManagement.Domain.Services
             string adminUserId,
             List<Permission> permissions);
 
-        Task<RegistrationResultModel> RegisterAsync(
-            string email,
-            string password,
-            string firstName,
-            string lastName,
-            string phoneNumber,
-            string company,
-            string department,
-            string jobTitle,
-            IReadOnlyList<Permission> permissions);
+        Task<RegistrationResultModel> RegisterAsync(RegistrationRequestDto model);
 
         Task<AdminUserResult> GetByIdAsync(string adminId);
 

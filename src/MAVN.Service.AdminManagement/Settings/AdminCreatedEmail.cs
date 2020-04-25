@@ -1,3 +1,4 @@
+﻿using System;
 using JetBrains.Annotations;
 
 namespace MAVN.Service.AdminManagement.Settings
@@ -7,5 +8,7 @@ namespace MAVN.Service.AdminManagement.Settings
     {
         public string EmailTemplateId { set; get; }
         public string SubjectTemplateId { set; get; }
+        public TimeSpan VerificationLinkExpirePeriod { get; set; }
+        public string VerificationLinkPath { set; get; }
     }
 }
