@@ -351,7 +351,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
             });
 
             var adminUser = _mapper.Map<AdminUser>(adminUserEncrypted);
-            _mapper.Map(adminProfile, adminUser);
+            _mapper.Map(adminProfile.Data, adminUser);
 
             return new AdminUserResult
             {
