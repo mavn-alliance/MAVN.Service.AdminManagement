@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Threading.Tasks;
 using Common;
@@ -41,6 +41,11 @@ namespace MAVN.Service.AdminManagement.DomainServices
 
             if (admin.Error == AdminUserErrorCodes.None)
             {
+                if (!admin.Profile.IsEmailVerified)
+                {
+                    return new AuthResultModel { Error = ServicesError.AdminEmailIsNotVerified };
+                }
+
                 if (admin.Profile.IsActive == false)
                 {
                     return new AuthResultModel {Error = ServicesError.AdminNotActive};

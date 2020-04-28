@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
@@ -28,14 +28,7 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             var adminUsersService = new Mock<IAdminUserService>();
 
             var response = new AdminCredentialsValidationResponse { Error = CredentialsError.LoginNotFound };
-            var adminUsersServiceResponse = new AdminUserResult
-            {
-                Error = AdminUserErrorCodes.None,
-                Profile = new AdminUser
-                {
-                    IsActive = true
-                }
-            };
+            var adminUsersServiceResponse = GetAdminUserResult();
 
             credentialsClient
                 .Setup(x => x.Admins.ValidateAsync(It.IsAny<CredentialsValidationRequest>()))
@@ -70,14 +63,7 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             var adminUsersService = new Mock<IAdminUserService>();
 
             var response = new AdminCredentialsValidationResponse { Error = CredentialsError.PasswordMismatch };
-            var adminUsersServiceResponse = new AdminUserResult
-            {
-                Error = AdminUserErrorCodes.None,
-                Profile = new AdminUser
-                {
-                    IsActive = true
-                }
-            };
+            var adminUsersServiceResponse = GetAdminUserResult();
 
             credentialsClient
                 .Setup(x => x.Admins.ValidateAsync(It.IsAny<CredentialsValidationRequest>()))
@@ -112,14 +98,7 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             var adminUsersService = new Mock<IAdminUserService>();
 
             var exception = new ClientApiException(HttpStatusCode.BadRequest, new ErrorResponse());
-            var adminUsersServiceResponse = new AdminUserResult
-            {
-                Error = AdminUserErrorCodes.None,
-                Profile = new AdminUser
-                {
-                    IsActive = true
-                }
-            };
+            var adminUsersServiceResponse = GetAdminUserResult();
 
             credentialsClient
                 .Setup(x => x.Admins.ValidateAsync(It.IsAny<CredentialsValidationRequest>()))
@@ -154,14 +133,7 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             var adminUsersService = new Mock<IAdminUserService>();
 
             var response = new AdminCredentialsValidationResponse { Error = CredentialsError.LoginAlreadyExists };
-            var adminUsersServiceResponse = new AdminUserResult
-            {
-                Error = AdminUserErrorCodes.None,
-                Profile = new AdminUser
-                {
-                    IsActive = true
-                }
-            };
+            var adminUsersServiceResponse = GetAdminUserResult();
 
             credentialsClient
                 .Setup(x => x.Admins.ValidateAsync(It.IsAny<CredentialsValidationRequest>()))
@@ -192,14 +164,7 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             var adminUsersService = new Mock<IAdminUserService>();
 
             var credentialsResponse = new AdminCredentialsValidationResponse { AdminId = "1" };
-            var adminUsersServiceResponse = new AdminUserResult
-            {
-                Error = AdminUserErrorCodes.None,
-                Profile = new AdminUser
-                {
-                    IsActive = true
-                }
-            };
+            var adminUsersServiceResponse = GetAdminUserResult();
 
             credentialsClient
                 .Setup(x => x.Admins.ValidateAsync(It.IsAny<CredentialsValidationRequest>()))
@@ -230,6 +195,19 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             Assert.Equal(credentialsResponse.AdminId, result.CustomerId);
             Assert.Equal(sessionResponse.SessionToken, result.Token);
             Assert.Equal(ServicesError.None, result.Error);
+        }
+
+        private AdminUserResult GetAdminUserResult()
+        {
+            return new AdminUserResult
+            {
+                Error = AdminUserErrorCodes.None,
+                Profile = new AdminUser
+                {
+                    IsEmailVerified = true,
+                    IsActive = true
+                }
+            };
         }
     }
 }
