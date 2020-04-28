@@ -11,6 +11,7 @@ namespace MAVN.Service.AdminManagement.Client
         None = 0,
         LoginNotFound,
         PasswordMismatch,
+        AdminEmailIsNotVerified,
         RegisteredWithAnotherPassword,
         AlreadyRegistered,
         InvalidEmailOrPasswordFormat,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +13,8 @@ namespace MAVN.Service.AdminManagement.Tests
         private readonly HashSet<string> _expectedPermissionLevels = new HashSet<string>
         {
             nameof(PermissionLevel.View),
-            nameof(PermissionLevel.Edit)
+            nameof(PermissionLevel.Edit),
+            nameof(PermissionLevel.PartnerEdit)
         };
         
         /// <summary>
