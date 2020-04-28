@@ -1,4 +1,4 @@
-namespace MAVN.Service.AdminManagement.Client.Models.Enums
+﻿namespace MAVN.Service.AdminManagement.Client.Models.Enums
 {
     /// <summary>
     /// Level of permission. Edit includes View.
@@ -12,6 +12,10 @@ namespace MAVN.Service.AdminManagement.Client.Models.Enums
         /// <summary>
         /// Editing rights.
         /// </summary>
-        Edit
+        Edit,
+        /// <summary>
+        /// Partner rights.
+        /// </summary>
+        PartnerEdit
     }
 }
