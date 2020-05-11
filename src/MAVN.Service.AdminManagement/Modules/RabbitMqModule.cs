@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using MAVN.Service.AdminManagement.Domain.Services;
 using MAVN.Service.AdminManagement.DomainServices;
 using MAVN.Service.AdminManagement.Settings;
-using Lykke.Service.NotificationSystem.SubscriberContract;
+using MAVN.Service.NotificationSystem.SubscriberContract;
 using Lykke.SettingsReader;
 using MAVN.Service.AdminManagement.Contract.Events;
 

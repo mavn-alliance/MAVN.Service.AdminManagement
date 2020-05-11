@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Falcon.Common;
+using MAVN.Common;
 using Lykke.Common.MsSql;
 using MAVN.Service.AdminManagement.Domain.Models;
 using MAVN.Service.AdminManagement.Domain.Repositories;

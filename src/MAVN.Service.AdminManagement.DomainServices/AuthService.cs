@@ -5,14 +5,14 @@ using Common;
 using Common.Log;
 using Lykke.Common.ApiLibrary.Exceptions;
 using Lykke.Common.Log;
-using Lykke.Service.Credentials.Client;
+using MAVN.Service.Credentials.Client;
 using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.Domain.Models;
 using MAVN.Service.AdminManagement.Domain.Services;
-using Lykke.Service.Credentials.Client.Models.Requests;
-using Lykke.Service.Credentials.Client.Models.Responses;
-using Lykke.Service.Sessions.Client;
-using Lykke.Service.Sessions.Client.Models;
+using MAVN.Service.Credentials.Client.Models.Requests;
+using MAVN.Service.Credentials.Client.Models.Responses;
+using MAVN.Service.Sessions.Client;
+using MAVN.Service.Sessions.Client.Models;
 
 namespace MAVN.Service.AdminManagement.DomainServices
 {

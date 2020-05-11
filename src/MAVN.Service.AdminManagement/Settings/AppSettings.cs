@@ -1,8 +1,8 @@
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Lykke.Sdk.Settings;
-using Lykke.Service.Credentials.Client;
+using MAVN.Service.Credentials.Client;
 using MAVN.Service.CustomerProfile.Client;
-using Lykke.Service.Sessions.Client;
+using MAVN.Service.Sessions.Client;
 
 namespace MAVN.Service.AdminManagement.Settings
 {
