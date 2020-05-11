@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Lykke.Sdk;
 using MAVN.Service.AdminManagement.Domain.Services;
-using Lykke.Service.NotificationSystem.SubscriberContract;
+using MAVN.Service.NotificationSystem.SubscriberContract;
 using MAVN.Service.AdminManagement.Contract.Events;
 
 namespace MAVN.Service.AdminManagement.Managers

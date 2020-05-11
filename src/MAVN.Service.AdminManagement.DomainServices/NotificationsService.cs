@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Lykke.Common;
 using MAVN.Service.AdminManagement.Domain.Services;
-using Lykke.Service.NotificationSystem.SubscriberContract;
+using MAVN.Service.NotificationSystem.SubscriberContract;
 using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.Domain.Models.Emails;
 

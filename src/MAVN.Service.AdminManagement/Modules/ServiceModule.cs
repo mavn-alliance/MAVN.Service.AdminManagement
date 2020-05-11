@@ -1,13 +1,13 @@
 ﻿using Autofac;
 using JetBrains.Annotations;
 using Lykke.Sdk;
-using Lykke.Service.Credentials.Client;
+using MAVN.Service.Credentials.Client;
 using MAVN.Service.AdminManagement.Domain.Services;
 using MAVN.Service.AdminManagement.DomainServices;
 using MAVN.Service.AdminManagement.Managers;
 using MAVN.Service.AdminManagement.Settings;
 using MAVN.Service.CustomerProfile.Client;
-using Lykke.Service.Sessions.Client;
+using MAVN.Service.Sessions.Client;
 using Lykke.SettingsReader;
 using StackExchange.Redis;
 using MAVN.Service.AdminManagement.Domain.Models;
