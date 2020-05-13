@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.AdminManagement.Domain.Models.Verification;
 using MAVN.Service.AdminManagement.Domain.Repositories;
 using MAVN.Service.AdminManagement.MsSqlRepositories.Entities;
