@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.AdminManagement.Domain.Models;
 using MAVN.Service.AdminManagement.Domain.Repositories;
 using MAVN.Service.AdminManagement.MsSqlRepositories.Entities;

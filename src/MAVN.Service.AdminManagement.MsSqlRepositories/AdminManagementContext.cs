@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Data.Common;
 using JetBrains.Annotations;
-using Lykke.Common.MsSql;
+using MAVN.Common.MsSql;
 using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.MsSqlRepositories.Entities;
 using Microsoft.EntityFrameworkCore;
