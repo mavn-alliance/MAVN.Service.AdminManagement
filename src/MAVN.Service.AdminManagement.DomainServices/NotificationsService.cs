@@ -18,6 +18,9 @@ namespace MAVN.Service.AdminManagement.DomainServices
         private readonly string _adminCreatedVerificationLinkPath;
         private readonly string _adminPasswordResetEmailTemplateId;
         private readonly string _adminPasswordResetEmailSubjectTemplateId;
+        private readonly string _partnerAdminWelcomeEmailTemplateId;
+        private readonly string _partnerAdminWelcomeEmailSubjectTemplateId;
+        private readonly string _partnerAdminCreatedVerificationLinkPath;
 
         public NotificationsService(
             IRabbitPublisher<EmailMessageEvent> emailsPublisher,
@@ -26,7 +29,10 @@ namespace MAVN.Service.AdminManagement.DomainServices
             string adminCreatedEmailSubjectTemplateId,
             string adminCreatedVerificationLinkPath,
             string adminPasswordResetEmailTemplateId,
-            string adminPasswordResetEmailSubjectTemplateId)
+            string adminPasswordResetEmailSubjectTemplateId,
+            string partnerAdminWelcomeEmailTemplateId,
+            string partnerAdminWelcomeEmailSubjectTemplateId,
+            string partnerAdminCreatedVerificationLinkPath)
         {
             _emailsPublisher = emailsPublisher;
             _backOfficeUrl = backOfficeUrl;
@@ -35,6 +41,9 @@ namespace MAVN.Service.AdminManagement.DomainServices
             _adminCreatedVerificationLinkPath = adminCreatedVerificationLinkPath;
             _adminPasswordResetEmailTemplateId = adminPasswordResetEmailTemplateId;
             _adminPasswordResetEmailSubjectTemplateId = adminPasswordResetEmailSubjectTemplateId;
+            _partnerAdminWelcomeEmailTemplateId = partnerAdminWelcomeEmailTemplateId;
+            _partnerAdminWelcomeEmailSubjectTemplateId = partnerAdminWelcomeEmailSubjectTemplateId;
+            _partnerAdminCreatedVerificationLinkPath = partnerAdminCreatedVerificationLinkPath;
         }
 
         public async Task NotifyAdminCreatedAsync(AdminCreatedEmailDto model)
@@ -53,6 +62,24 @@ namespace MAVN.Service.AdminManagement.DomainServices
 
             await SendEmailAsync(model.AdminUserId, model.Email, values, _adminCreatedEmailTemplateId,
                 _adminCreatedEmailSubjectTemplateId);
+        }
+
+        public async Task NotifyPartnerAdminWelcomeAsync(AdminCreatedEmailDto model)
+        {
+            var url = GetLocalizedPath(_backOfficeUrl, model.Localization);
+
+            var values = new Dictionary<string, string>
+            {
+                {nameof(model.Name), model.Name},
+                {"BackOfficeUrl", url},
+                {"PartnersUrl", url + _partnerAdminCreatedVerificationLinkPath.TrimStart('/').Replace("{0}", model.EmailVerificationCode)},
+                {"Login", model.Email},
+                {nameof(model.Password), model.Password},
+                {nameof(model.Localization), model.Localization.ToString()}
+            };
+
+            await SendEmailAsync(model.AdminUserId, model.Email, values, _partnerAdminWelcomeEmailTemplateId,
+                _partnerAdminWelcomeEmailSubjectTemplateId);
         }
 
         public async Task NotifyAdminPasswordResetAsync(string adminUserId, string email, string login, string password, string name)

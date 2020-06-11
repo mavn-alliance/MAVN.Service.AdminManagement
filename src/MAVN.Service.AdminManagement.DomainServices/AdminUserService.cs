@@ -27,6 +27,8 @@ namespace MAVN.Service.AdminManagement.DomainServices
 {
     public class AdminUserService : IAdminUserService
     {
+        private const string PartnerPermissionsName = "ProgramPartners";
+
         private readonly IAdminUsersRepository _adminUsersRepository;
         private readonly INotificationsService _notificationsService;
         private readonly ICredentialsClient _credentialsClient;
@@ -271,15 +273,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
 
             #endregion
 
-            await _notificationsService.NotifyAdminCreatedAsync(new AdminCreatedEmailDto
-            {
-                AdminUserId = adminId,
-                Email = model.Email,
-                EmailVerificationCode = emailVerificationCode.ToBase64(),
-                Password = model.Password,
-                Name = $"{model.FirstName} {model.LastName}",
-                Localization = model.Localization
-            });
+            await SendNotification(model, adminId, emailVerificationCode, model.Permissions);
 
             _log.Info(message: "Successfully generated AdminCreatedEmail", context: adminId);
 
@@ -382,6 +376,37 @@ namespace MAVN.Service.AdminManagement.DomainServices
             }
 
             return permissions;
+        }
+
+        private async Task SendNotification(RegistrationRequestDto model, string adminId, string emailVerificationCode, IReadOnlyList<Permission> permissions)
+        {
+            var partnersPermissions = permissions.FirstOrDefault(x => x.Type == PartnerPermissionsName);
+
+            //check if it is program partner
+            if (partnersPermissions != null && partnersPermissions.Level == PermissionLevel.PartnerEdit)
+            {
+                await _notificationsService.NotifyPartnerAdminWelcomeAsync(new AdminCreatedEmailDto
+                {
+                    AdminUserId = adminId,
+                    Email = model.Email,
+                    EmailVerificationCode = emailVerificationCode.ToBase64(),
+                    Password = model.Password,
+                    Name = $"{model.FirstName} {model.LastName}",
+                    Localization = model.Localization
+                });
+            }
+            else
+            {
+                await _notificationsService.NotifyAdminCreatedAsync(new AdminCreatedEmailDto
+                {
+                    AdminUserId = adminId,
+                    Email = model.Email,
+                    EmailVerificationCode = emailVerificationCode.ToBase64(),
+                    Password = model.Password,
+                    Name = $"{model.FirstName} {model.LastName}",
+                    Localization = model.Localization
+                });
+            }
         }
 
         private async Task<IReadOnlyList<AdminUser>> LoadSensitiveDataAsync(
