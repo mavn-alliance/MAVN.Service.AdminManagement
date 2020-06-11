@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Lykke.SettingsReader.Attributes;
 
 namespace MAVN.Service.AdminManagement.Settings
 {
@@ -9,11 +8,9 @@ namespace MAVN.Service.AdminManagement.Settings
         public DbSettings Db { get; set; }
         public string BackOfficeLink { set; get; }
         public AdminCreatedEmail AdminCreatedEmail { set; get; }
-        
+        public PartnerAdminWelcomeEmail PartnerAdminWelcomeEmail { set; get; }
         public PasswordResetEmail PasswordResetEmail { set; get; }
-        
         public RabbitMqSettings RabbitMq { get; set; }
-        
         public RedisSettings Redis { set; get; }
         public LimitationSettings LimitationSettings { get; set; }
     }

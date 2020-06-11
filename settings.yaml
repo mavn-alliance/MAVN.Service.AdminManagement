@@ -39,6 +39,13 @@ AdminManagementService:
       settings-key: AdminManagementService-PasswordResetEmail-EmailTemplateId
     SubjectTemplateId:
       settings-key: AdminManagementService-PasswordResetEmail-SubjectTemplateId
+  PartnerAdminWelcomeEmail:
+    EmailTemplateId:
+      settings-key: AdminManagementService-PartnerAdminWelcomeEmail-EmailTemplateId
+    SubjectTemplateId:
+      settings-key: AdminManagementService-PartnerAdminWelcomeEmail-SubjectTemplateId
+    VerificationLinkPath:
+      settings-key: AdminManagementService-PartnerAdminWelcomeEmail-VerificationLinkPath
 
 SessionsService:
   ServiceUrl:

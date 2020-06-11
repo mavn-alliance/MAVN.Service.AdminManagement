@@ -87,6 +87,9 @@ namespace MAVN.Service.AdminManagement.Modules
                 .WithParameter("adminCreatedVerificationLinkPath", _appSettings.CurrentValue.AdminManagementService.AdminCreatedEmail.VerificationLinkPath)
                 .WithParameter("adminPasswordResetEmailTemplateId", _appSettings.CurrentValue.AdminManagementService.PasswordResetEmail.EmailTemplateId)
                 .WithParameter("adminPasswordResetEmailSubjectTemplateId", _appSettings.CurrentValue.AdminManagementService.PasswordResetEmail.SubjectTemplateId)
+                .WithParameter("partnerAdminWelcomeEmailTemplateId", _appSettings.CurrentValue.AdminManagementService.PartnerAdminWelcomeEmail.EmailTemplateId)
+                .WithParameter("partnerAdminWelcomeEmailSubjectTemplateId", _appSettings.CurrentValue.AdminManagementService.PartnerAdminWelcomeEmail.SubjectTemplateId)
+                .WithParameter("partnerAdminCreatedVerificationLinkPath", _appSettings.CurrentValue.AdminManagementService.PartnerAdminWelcomeEmail.VerificationLinkPath)
                 .SingleInstance();
             
             builder.RegisterType<StartupManager>()
