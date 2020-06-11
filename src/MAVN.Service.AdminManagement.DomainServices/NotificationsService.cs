@@ -20,7 +20,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
         private readonly string _adminPasswordResetEmailSubjectTemplateId;
         private readonly string _partnerAdminWelcomeEmailTemplateId;
         private readonly string _partnerAdminWelcomeEmailSubjectTemplateId;
-        private readonly string _partnerAdminCreatedVerificationLinkPath;
+        private readonly string _partnerAdminWelcomeLinkPath;
 
         public NotificationsService(
             IRabbitPublisher<EmailMessageEvent> emailsPublisher,
@@ -32,7 +32,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
             string adminPasswordResetEmailSubjectTemplateId,
             string partnerAdminWelcomeEmailTemplateId,
             string partnerAdminWelcomeEmailSubjectTemplateId,
-            string partnerAdminCreatedVerificationLinkPath)
+            string partnerAdminWelcomeLinkPath)
         {
             _emailsPublisher = emailsPublisher;
             _backOfficeUrl = backOfficeUrl;
@@ -43,7 +43,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
             _adminPasswordResetEmailSubjectTemplateId = adminPasswordResetEmailSubjectTemplateId;
             _partnerAdminWelcomeEmailTemplateId = partnerAdminWelcomeEmailTemplateId;
             _partnerAdminWelcomeEmailSubjectTemplateId = partnerAdminWelcomeEmailSubjectTemplateId;
-            _partnerAdminCreatedVerificationLinkPath = partnerAdminCreatedVerificationLinkPath;
+            _partnerAdminWelcomeLinkPath = partnerAdminWelcomeLinkPath;
         }
 
         public async Task NotifyAdminCreatedAsync(AdminCreatedEmailDto model)
@@ -64,21 +64,14 @@ namespace MAVN.Service.AdminManagement.DomainServices
                 _adminCreatedEmailSubjectTemplateId);
         }
 
-        public async Task NotifyPartnerAdminWelcomeAsync(AdminCreatedEmailDto model)
+        public async Task NotifyPartnerAdminWelcomeAsync(string userId, string email)
         {
-            var url = GetLocalizedPath(_backOfficeUrl, model.Localization);
-
             var values = new Dictionary<string, string>
             {
-                {nameof(model.Name), model.Name},
-                {"BackOfficeUrl", url},
-                {"PartnersUrl", url + _partnerAdminCreatedVerificationLinkPath.TrimStart('/').Replace("{0}", model.EmailVerificationCode)},
-                {"Login", model.Email},
-                {nameof(model.Password), model.Password},
-                {nameof(model.Localization), model.Localization.ToString()}
+                {"PartnersUrl", _backOfficeUrl + _partnerAdminWelcomeLinkPath.TrimStart('/')},
             };
 
-            await SendEmailAsync(model.AdminUserId, model.Email, values, _partnerAdminWelcomeEmailTemplateId,
+            await SendEmailAsync(userId, email, values, _partnerAdminWelcomeEmailTemplateId,
                 _partnerAdminWelcomeEmailSubjectTemplateId);
         }
 

@@ -7,7 +7,7 @@ namespace MAVN.Service.AdminManagement.Domain.Services
     public interface INotificationsService
     {
         Task NotifyAdminCreatedAsync(AdminCreatedEmailDto model);
-        Task NotifyPartnerAdminWelcomeAsync(AdminCreatedEmailDto model);
+        Task NotifyPartnerAdminWelcomeAsync(string userId, string email);
         Task NotifyAdminPasswordResetAsync(string adminUserId, string email, string login, string password, string name);
     }
 }

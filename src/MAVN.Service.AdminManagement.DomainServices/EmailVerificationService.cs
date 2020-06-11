@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
@@ -13,17 +14,25 @@ namespace MAVN.Service.AdminManagement.DomainServices
 {
     public class EmailVerificationService : IEmailVerificationService
     {
+        private const string PartnerPermissionsName = "ProgramPartners";
+
         private readonly IEmailVerificationCodeRepository _emailVerificationCodeRepository;
         private readonly IRabbitPublisher<AdminEmailVerifiedEvent> _codeVerifiedEventPublisher;
+        private readonly INotificationsService _notificationsService;
+        private readonly IAdminUserService _adminUserService;
         private readonly ILog _log;
 
         public EmailVerificationService(
             IEmailVerificationCodeRepository emailVerificationCodeRepository,
             IRabbitPublisher<AdminEmailVerifiedEvent> codeVerifiedEventPublisher,
+            INotificationsService notificationsService,
+            IAdminUserService adminUserService,
             ILogFactory logFactory)
         {
             _emailVerificationCodeRepository = emailVerificationCodeRepository;
             _codeVerifiedEventPublisher = codeVerifiedEventPublisher;
+            _notificationsService = notificationsService;
+            _adminUserService = adminUserService;
             _log = logFactory.CreateLog(this);
         }
 
@@ -87,6 +96,14 @@ namespace MAVN.Service.AdminManagement.DomainServices
                         AdminId = existingEntity.AdminId,
                         TimeStamp = DateTime.UtcNow
                     }));
+
+            var admin = await _adminUserService.GetByIdAsync(existingEntity.AdminId);
+
+            var partnersPermissions = admin.Profile.Permissions.FirstOrDefault(x => x.Type == PartnerPermissionsName);
+
+            //check if it is program partner
+            if (partnersPermissions != null && partnersPermissions.Level == PermissionLevel.PartnerEdit)
+                await _notificationsService.NotifyPartnerAdminWelcomeAsync(admin.Profile.AdminUserId, admin.Profile.Email);
 
             return new ConfirmVerificationCodeResultModel { IsVerified = true };
         }

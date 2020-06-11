@@ -4,6 +4,6 @@
     {
         public string EmailTemplateId { set; get; }
         public string SubjectTemplateId { set; get; }
-        public string VerificationLinkPath { set; get; }
+        public string PartnersLinkPath { set; get; }
     }
 }
