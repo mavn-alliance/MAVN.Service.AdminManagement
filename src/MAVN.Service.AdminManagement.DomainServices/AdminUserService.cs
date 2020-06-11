@@ -380,33 +380,23 @@ namespace MAVN.Service.AdminManagement.DomainServices
 
         private async Task SendNotification(RegistrationRequestDto model, string adminId, string emailVerificationCode, IReadOnlyList<Permission> permissions)
         {
+            var adminCreatedDto = new AdminCreatedEmailDto
+            {
+                AdminUserId = adminId,
+                Email = model.Email,
+                EmailVerificationCode = emailVerificationCode.ToBase64(),
+                Password = model.Password,
+                Name = $"{model.FirstName} {model.LastName}",
+                Localization = model.Localization
+            };
+
             var partnersPermissions = permissions.FirstOrDefault(x => x.Type == PartnerPermissionsName);
 
             //check if it is program partner
             if (partnersPermissions != null && partnersPermissions.Level == PermissionLevel.PartnerEdit)
-            {
-                await _notificationsService.NotifyPartnerAdminWelcomeAsync(new AdminCreatedEmailDto
-                {
-                    AdminUserId = adminId,
-                    Email = model.Email,
-                    EmailVerificationCode = emailVerificationCode.ToBase64(),
-                    Password = model.Password,
-                    Name = $"{model.FirstName} {model.LastName}",
-                    Localization = model.Localization
-                });
-            }
+                await _notificationsService.NotifyPartnerAdminWelcomeAsync(adminCreatedDto);
             else
-            {
-                await _notificationsService.NotifyAdminCreatedAsync(new AdminCreatedEmailDto
-                {
-                    AdminUserId = adminId,
-                    Email = model.Email,
-                    EmailVerificationCode = emailVerificationCode.ToBase64(),
-                    Password = model.Password,
-                    Name = $"{model.FirstName} {model.LastName}",
-                    Localization = model.Localization
-                });
-            }
+                await _notificationsService.NotifyAdminCreatedAsync(adminCreatedDto);
         }
 
         private async Task<IReadOnlyList<AdminUser>> LoadSensitiveDataAsync(
