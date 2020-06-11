@@ -44,8 +44,8 @@ AdminManagementService:
       settings-key: AdminManagementService-PartnerAdminWelcomeEmail-EmailTemplateId
     SubjectTemplateId:
       settings-key: AdminManagementService-PartnerAdminWelcomeEmail-SubjectTemplateId
-    VerificationLinkPath:
-      settings-key: AdminManagementService-PartnerAdminWelcomeEmail-VerificationLinkPath
+    PartnersLinkPath:
+      settings-key: AdminManagementService-PartnerAdminWelcomeEmail-PartnersLinkPath
 
 SessionsService:
   ServiceUrl:
