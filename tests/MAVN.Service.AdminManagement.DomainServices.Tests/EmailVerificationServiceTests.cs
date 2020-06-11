@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common;
 using Lykke.Logs;
 using Lykke.Logs.Loggers.LykkeConsole;
 using MAVN.Service.AdminManagement.Contract.Events;
 using MAVN.Service.AdminManagement.Domain.Enums;
+using MAVN.Service.AdminManagement.Domain.Models;
 using MAVN.Service.AdminManagement.Domain.Models.Verification;
 using MAVN.Service.AdminManagement.Domain.Repositories;
 using MAVN.Service.AdminManagement.Domain.Services;
@@ -15,6 +17,9 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
 {
     public class EmailVerificationServiceTests
     {
+        private readonly Mock<IAdminUserService> _adminUserServiceMock = new Mock<IAdminUserService>();
+        private readonly Mock<INotificationsService> _notificationsServiceMock = new Mock<INotificationsService>();
+
         [Fact]
         public async Task UserTriesToConfirmEmail_WithNewAdmin_Successfully()
         {
@@ -35,6 +40,9 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
             verificationEmailRepository
                 .Setup(x => x.CreateOrUpdateAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync((IVerificationCode)null);
+
+            _adminUserServiceMock.Setup(x => x.GetByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new AdminUserResult {Profile = new AdminUser {Permissions = new List<Permission>()}});
             
             var publisherCodeVerified = new Mock<IRabbitPublisher<AdminEmailVerifiedEvent>>();
 
@@ -44,6 +52,8 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
                 emailVerificationService = new EmailVerificationService(
                     verificationEmailRepository.Object,
                     publisherCodeVerified.Object,
+                    _notificationsServiceMock.Object,
+                    _adminUserServiceMock.Object,
                     logFactory
                 );
             }
@@ -81,6 +91,8 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
                 emailVerificationService = new EmailVerificationService(
                     verificationEmailRepository.Object,
                     publisherCodeVerified.Object,
+                    _notificationsServiceMock.Object,
+                    _adminUserServiceMock.Object,
                     logFactory
                 );
             }
@@ -114,6 +126,8 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
                 emailVerificationService = new EmailVerificationService(
                     verificationEmailRepository.Object,
                     publisherCodeVerified.Object,
+                    _notificationsServiceMock.Object,
+                    _adminUserServiceMock.Object,
                     logFactory
                 );
             }
@@ -155,6 +169,8 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
                 emailVerificationService = new EmailVerificationService(
                     verificationEmailRepository.Object,
                     publisherCodeVerified.Object,
+                    _notificationsServiceMock.Object,
+                    _adminUserServiceMock.Object,
                     logFactory
                 );
             }
@@ -190,6 +206,8 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
                 emailVerificationService = new EmailVerificationService(
                     verificationEmailRepository.Object,
                     publisherCodeVerified.Object,
+                    _notificationsServiceMock.Object,
+                    _adminUserServiceMock.Object,
                     logFactory
                 );
             }
@@ -229,6 +247,8 @@ namespace MAVN.Service.AdminManagement.DomainServices.Tests
                 emailVerificationService = new EmailVerificationService(
                     verificationEmailRepository.Object,
                     publisherCodeVerified.Object,
+                    _notificationsServiceMock.Object,
+                    _adminUserServiceMock.Object,
                     logFactory
                 );
             }
