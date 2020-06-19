@@ -68,7 +68,7 @@ namespace MAVN.Service.AdminManagement.DomainServices
         {
             var values = new Dictionary<string, string>
             {
-                {"PartnersUrl", _backOfficeUrl + _partnerAdminWelcomeLinkPath.TrimStart('/')},
+                {"PartnersUrl", _backOfficeUrl + _partnerAdminWelcomeLinkPath},
             };
 
             await SendEmailAsync(userId, email, values, _partnerAdminWelcomeEmailTemplateId,
@@ -91,9 +91,9 @@ namespace MAVN.Service.AdminManagement.DomainServices
 
         private async Task SendEmailAsync(string customerId, string destination, Dictionary<string, string> values, string emailTemplateId, string subjectTemplateId)
         {
-            if(!string.IsNullOrWhiteSpace(destination))
+            if (!string.IsNullOrWhiteSpace(destination))
                 values["target_email"] = destination;
-            
+
             await _emailsPublisher.PublishAsync(new EmailMessageEvent
             {
                 CustomerId = customerId,
