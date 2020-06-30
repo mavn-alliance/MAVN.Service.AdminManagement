@@ -1,21 +1,22 @@
-using System;
-using System.Data.SqlClient;
+﻿using System;
 using System.Threading.Tasks;
-using MAVN.Common.MsSql;
+using MAVN.Persistence.PostgreSQL.Legacy;
 using MAVN.Service.AdminManagement.Domain.Models.Verification;
 using MAVN.Service.AdminManagement.Domain.Repositories;
 using MAVN.Service.AdminManagement.MsSqlRepositories.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace MAVN.Service.AdminManagement.MsSqlRepositories.Repositories
 {
     public class EmailVerificationCodeRepository : IEmailVerificationCodeRepository
     {
-        private readonly MsSqlContextFactory<AdminManagementContext> _contextFactory;
+        private readonly PostgreSQLContextFactory<AdminManagementContext> _contextFactory;
         private readonly TimeSpan _verificationLinkExpirePeriod;
 
         public EmailVerificationCodeRepository(
-            MsSqlContextFactory<AdminManagementContext> contextFactory,
+            PostgreSQLContextFactory<AdminManagementContext> contextFactory,
             TimeSpan verificationLinkExpirePeriod)
         {
             _contextFactory = contextFactory;
@@ -37,8 +38,8 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Repositories
                 }
                 catch (DbUpdateException e)
                 {
-                    if (e.InnerException is SqlException sqlException &&
-                        sqlException.Number == MsSqlErrorCodes.PrimaryKeyConstraintViolation)
+                    if (e.InnerException is PostgresException sqlException &&
+                        sqlException.SqlState == PostgreSqlErrorCodes.UniqueViolation.ToString())
                     {
                         context.EmailVerificationCodes.Update(entity);
 

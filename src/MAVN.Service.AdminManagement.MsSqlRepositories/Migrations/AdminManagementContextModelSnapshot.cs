@@ -3,8 +3,8 @@ using System;
 using MAVN.Service.AdminManagement.MsSqlRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MAVN.Service.AdminManagement.MsSqlRepositories.Migrations
 {
@@ -16,15 +16,15 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("admin_users")
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("MAVN.Service.AdminManagement.MsSqlRepositories.Entities.AdminUserEntity", b =>
                 {
                     b.Property<string>("AdminUserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("admin_id");
+                        .HasColumnName("admin_id")
+                        .HasColumnType("text");
 
                     b.Property<string>("EmailHash")
                         .IsRequired()
@@ -34,14 +34,17 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Migrations
                     b.Property<bool>("IsDisabled")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("is_disabled")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("RegisteredAt")
-                        .HasColumnName("registered_at");
+                        .HasColumnName("registered_at")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("UseCustomPermissions")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("use_custom_permissions")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.HasKey("AdminUserId");
@@ -55,18 +58,21 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Migrations
             modelBuilder.Entity("MAVN.Service.AdminManagement.MsSqlRepositories.Entities.EmailVerificationCodeEntity", b =>
                 {
                     b.Property<string>("AdminId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("admin_id");
+                        .HasColumnName("admin_id")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("ExpireDate")
-                        .HasColumnName("expire_date");
+                        .HasColumnName("expire_date")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsVerified")
-                        .HasColumnName("is_verified");
+                        .HasColumnName("is_verified")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("VerificationCode")
                         .IsRequired()
-                        .HasColumnName("code");
+                        .HasColumnName("code")
+                        .HasColumnType("text");
 
                     b.HasKey("AdminId");
 
@@ -79,20 +85,23 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories.Migrations
             modelBuilder.Entity("MAVN.Service.AdminManagement.MsSqlRepositories.Entities.PermissionEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnType("text");
 
                     b.Property<string>("AdminUserId")
                         .IsRequired()
-                        .HasColumnName("admin_id");
+                        .HasColumnName("admin_id")
+                        .HasColumnType("text");
 
                     b.Property<string>("Level")
                         .IsRequired()
-                        .HasColumnName("level");
+                        .HasColumnName("level")
+                        .HasColumnType("text");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnName("type");
+                        .HasColumnName("type")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
