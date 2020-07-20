@@ -1,12 +1,12 @@
-using Autofac;
+﻿using Autofac;
 using JetBrains.Annotations;
-using MAVN.Common.MsSql;
 using MAVN.Service.AdminManagement.Domain.Repositories;
 using MAVN.Service.AdminManagement.MsSqlRepositories;
 using MAVN.Service.AdminManagement.MsSqlRepositories.Repositories;
 using MAVN.Service.AdminManagement.Settings;
 using Lykke.SettingsReader;
 using System;
+using MAVN.Persistence.PostgreSQL.Legacy;
 
 namespace MAVN.Service.AdminManagement.Modules
 {
@@ -24,7 +24,7 @@ namespace MAVN.Service.AdminManagement.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterMsSql(
+            builder.RegisterPostgreSQL(
                 _settings.DbConnectionString,
                 connString => new AdminManagementContext(connString, false),
                 dbConn => new AdminManagementContext(dbConn));

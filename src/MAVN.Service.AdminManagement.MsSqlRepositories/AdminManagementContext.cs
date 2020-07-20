@@ -1,14 +1,14 @@
-using System;
+﻿using System;
 using System.Data.Common;
 using JetBrains.Annotations;
-using MAVN.Common.MsSql;
+using MAVN.Persistence.PostgreSQL.Legacy;
 using MAVN.Service.AdminManagement.Domain.Enums;
 using MAVN.Service.AdminManagement.MsSqlRepositories.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MAVN.Service.AdminManagement.MsSqlRepositories
 {
-    public class AdminManagementContext : MsSqlContext
+    public class AdminManagementContext : PostgreSQLContext
     {
         private const string Schema = "admin_users";
 
@@ -31,7 +31,7 @@ namespace MAVN.Service.AdminManagement.MsSqlRepositories
         {
         }
 
-        protected override void OnLykkeModelCreating(ModelBuilder modelBuilder)
+        protected override void OnMAVNModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AdminUserEntity>()
                 .HasIndex(c => c.EmailHash)
